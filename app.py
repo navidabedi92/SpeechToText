@@ -4,9 +4,11 @@ from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 import librosa
 import numpy as np
 import os
-import uuid  # Import UUID for unique filenames
+import uuid
+from werkzeug.exceptions import RequestEntityTooLarge
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10MB limit
 
 # Load model and processor
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -36,11 +38,11 @@ def transcribe():
         return jsonify({"error": "No audio file provided"}), 400
     
     file = request.files["audio"]
-    
-    # Generate a unique filename using GUID (UUID)
+
+    # Generate a unique filename
     unique_filename = f"{uuid.uuid4().hex}.mp3"
     file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
-    
+
     file.save(file_path)
 
     # Load and process audio
@@ -50,10 +52,14 @@ def transcribe():
     sample = {"raw": waveform, "sampling_rate": sample_rate}
     result = pipe(sample)
 
-    # Remove temporary file (optional cleanup)
+    # Cleanup temporary files
     os.remove(file_path)
 
-    return jsonify({"transcription": result["text"]})
+    return jsonify({"filename": unique_filename, "transcription": result["text"]})
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    return jsonify({"error": "File size exceeds 10MB limit"}), 413
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
