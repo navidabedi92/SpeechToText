@@ -9,33 +9,35 @@ import numpy as np
 
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-model_id = "openai/whisper-large-v3-turbo"
+print(device)
+# torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-model = AutoModelForSpeechSeq2Seq.from_pretrained(
-    model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
-)
-model.to(device)
+# model_id = "openai/whisper-large-v3-turbo"
 
-processor = AutoProcessor.from_pretrained(model_id)
+# model = AutoModelForSpeechSeq2Seq.from_pretrained(
+#     model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
+# )
+# model.to(device)
 
-pipe = pipeline(
-    "automatic-speech-recognition",
-    model=model,
-    tokenizer=processor.tokenizer,
-    feature_extractor=processor.feature_extractor,
-    torch_dtype=torch_dtype,
-    device=device,
-    # The line below was added to fix the issue
-    return_timestamps=True  # This tells the pipeline to expect timestamps in the output
-)
-dataset = load_dataset("distil-whisper/librispeech_long", "clean", split="validation")
-sample = dataset[0]["audio"]
+# processor = AutoProcessor.from_pretrained(model_id)
 
-result = pipe(sample)
-print('111111')
-print(result["text"])
+# pipe = pipeline(
+#     "automatic-speech-recognition",
+#     model=model,
+#     tokenizer=processor.tokenizer,
+#     feature_extractor=processor.feature_extractor,
+#     torch_dtype=torch_dtype,
+#     device=device,
+#     # The line below was added to fix the issue
+#     return_timestamps=True  # This tells the pipeline to expect timestamps in the output
+# )
+# dataset = load_dataset("distil-whisper/librispeech_long", "clean", split="validation")
+# sample = dataset[0]["audio"]
+
+# result = pipe(sample)
+# print('111111')
+# print(result["text"])
 
 
 # file_path = "/content/FemaleVoice.mp3"
