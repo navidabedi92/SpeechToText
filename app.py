@@ -3,6 +3,7 @@ import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 import librosa
 import numpy as np
+import os
 
 app = Flask(__name__)
 
@@ -25,17 +26,27 @@ pipe = pipeline(
     return_timestamps=True
 )
 
+UPLOAD_FOLDER = "./uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
+    if "audio" not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+    
     file = request.files["audio"]
-    file_path = "./uploaded_audio.mp3"
+    file_path = os.path.join(UPLOAD_FOLDER, "uploaded_audio.mp3")
     file.save(file_path)
 
+    # Load and process audio
     waveform, sample_rate = librosa.load(file_path, sr=None, mono=True)
     waveform = np.array(waveform, dtype=np.float32)
 
     sample = {"raw": waveform, "sampling_rate": sample_rate}
     result = pipe(sample)
+
+    # Optional: Remove the temporary file after processing
+    os.remove(file_path)
 
     return jsonify({"transcription": result["text"]})
 
