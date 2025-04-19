@@ -4,6 +4,7 @@ from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 import librosa
 import numpy as np
 import os
+import uuid  # Import UUID for unique filenames
 
 app = Flask(__name__)
 
@@ -35,7 +36,11 @@ def transcribe():
         return jsonify({"error": "No audio file provided"}), 400
     
     file = request.files["audio"]
-    file_path = os.path.join(UPLOAD_FOLDER, "uploaded_audio.mp3")
+    
+    # Generate a unique filename using GUID (UUID)
+    unique_filename = f"{uuid.uuid4().hex}.mp3"
+    file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+    
     file.save(file_path)
 
     # Load and process audio
@@ -45,7 +50,7 @@ def transcribe():
     sample = {"raw": waveform, "sampling_rate": sample_rate}
     result = pipe(sample)
 
-    # Optional: Remove the temporary file after processing
+    # Remove temporary file (optional cleanup)
     os.remove(file_path)
 
     return jsonify({"transcription": result["text"]})
