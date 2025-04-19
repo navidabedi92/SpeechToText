@@ -28,8 +28,8 @@ pipe = pipeline(
 )
 
 # Load dataset sample
-dataset = load_dataset("distil-whisper/librispeech_long", "clean", split="validation")
-sample = dataset[0]["audio"]
+# dataset = load_dataset("distil-whisper/librispeech_long", "clean", split="validation")
+# sample = dataset[0]["audio"]
 
 # Process dataset sample
 # result = pipe(sample)
@@ -37,7 +37,7 @@ sample = dataset[0]["audio"]
 # print(result["text"])
 
 # Process local file
-file_path = "./FemaleVoice.mp3"  # Relative path to the project directory
+file_path = "FemaleVoice.mp3"  # Relative path to the project directory
 
 waveform, sample_rate = librosa.load(file_path, sr=None, mono=True)
 
