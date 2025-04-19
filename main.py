@@ -48,4 +48,10 @@ waveform = np.array(waveform, dtype=np.float32)
 sample = {"raw": waveform, "sampling_rate": sample_rate}
 result = pipe(sample)
 
+output_file = "./output.txt"
+
+# Save the text result to a file
+with open(output_file, "w", encoding="utf-8") as f:
+    f.write(result["text"])
+
 print(result["text"])
