@@ -1,5 +1,5 @@
-transformers
-datasets[audio]
-accelerate
-torchaudio
 flask
+transformers
+torch
+librosa
+numpy
